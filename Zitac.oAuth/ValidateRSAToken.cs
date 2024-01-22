@@ -3,7 +3,8 @@ using DecisionsFramework.Design.ConfigurationStorage.Attributes;
 using DecisionsFramework.Design.Flow.Mapping;
 using DecisionsFramework.Design.Flow.CoreSteps;
 using System.Security.Cryptography;
-using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Zitac.oAuth;
 
@@ -39,44 +40,63 @@ public class ValidateToken : BaseFlowAwareStep, ISyncStep, IDataConsumer, IDataP
 
     public ResultData Run(StepStartData data)
     {
-        string tokenStr = data.Data["Token String"] as string;
-        string modulus = data.Data["Modulus (n)"] as string;
-        string exponent = data.Data["Exponent (e)"] as string;
+        string token = data.Data["Token String"] as string;
+        string n = data.Data["Modulus (n)"] as string;
+        string e = data.Data["Exponent (e)"] as string;
  
-        string[] tokenParts = tokenStr.Split('.');
 
-        RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-        rsa.ImportParameters(
-          new RSAParameters()
-          {
-              Modulus = FromBase64Url(modulus),
-              Exponent = FromBase64Url(exponent)
-          });
+        // Convert Base64 URL encoded strings to byte arrays
+        var modulusBytes = Base64UrlDecode(n);
+        var exponentBytes = Base64UrlDecode(e);
 
-        SHA256 sha256 = SHA256.Create();
-        byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(tokenParts[0] + '.' + tokenParts[1]));
-
-        RSAPKCS1SignatureDeformatter rsaDeformatter = new RSAPKCS1SignatureDeformatter(rsa);
-        rsaDeformatter.SetHashAlgorithm("SHA256");
-        if (rsaDeformatter.VerifySignature(hash, FromBase64Url(tokenParts[2])))
+        // Create RSA parameters and import them into an RSA object
+        RSAParameters rsaParameters = new RSAParameters
         {
-            return new ResultData("True");
-        }
-        else
+            Modulus = modulusBytes,
+            Exponent = exponentBytes
+        };
+
+        using (var rsa = RSA.Create())
         {
-            return new ResultData("False");
+            rsa.ImportParameters(rsaParameters);
+
+            // Create a token validation parameters object
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new RsaSecurityKey(rsa),
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                // Validate the token
+                tokenHandler.ValidateToken(token, tokenValidationParameters, out var validatedToken);
+                return new ResultData("True");
+            }
+            catch (Exception ex)
+            {
+                return new ResultData("False");
+            }
         }
+    }
 
-
-        static byte[] FromBase64Url(string base64Url)
+    private static byte[] Base64UrlDecode(string input)
+    {
+        string output = input;
+        output = output.Replace('-', '+'); // 62nd char of encoding
+        output = output.Replace('_', '/'); // 63rd char of encoding
+        switch (output.Length % 4) // Pad with trailing '='s
         {
-            string padded = base64Url.Length % 4 == 0
-                ? base64Url : base64Url + "====".Substring(base64Url.Length % 4);
-            string base64 = padded.Replace("_", "/")
-                                  .Replace("-", "+");
-            return Convert.FromBase64String(base64);
+            case 0: break; // No pad chars in this case
+            case 2: output += "=="; break; // Two pad chars
+            case 3: output += "="; break; // One pad char
+            default: throw new System.Exception("Illegal base64url string!");
         }
-
+        return Convert.FromBase64String(output); // Standard base64 decoder
     }
 
 }
