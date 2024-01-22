@@ -1,0 +1,45 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "Zitac.oAuth/1.0.0": {
+        "dependencies": {
+          "DecisionsSDK": "8.16.0"
+        },
+        "runtime": {
+          "Zitac.oAuth.dll": {}
+        }
+      },
+      "DecisionsSDK/8.16.0": {
+        "runtime": {
+          "lib/net7.0/Decisions.Web.Core.dll": {
+            "assemblyVersion": "8.16.0.0",
+            "fileVersion": "8.16.0.7091"
+          },
+          "lib/net7.0/DecisionsFramework.dll": {
+            "assemblyVersion": "8.16.0.0",
+            "fileVersion": "8.16.0.7091"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Zitac.oAuth/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DecisionsSDK/8.16.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Qnl1r2lHm2jshg0QaSVKUsVNHeShdQTOL+Iam/si2sXA3zA7G+8E49/srESOwY5trAtipUNkkFvEU2urEZYaeA==",
+      "path": "decisionssdk/8.16.0",
+      "hashPath": "decisionssdk.8.16.0.nupkg.sha512"
+    }
+  }
+}
