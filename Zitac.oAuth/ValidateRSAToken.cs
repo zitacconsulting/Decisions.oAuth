@@ -82,7 +82,6 @@ public class ValidateToken : BaseFlowAwareStep, ISyncStep, IDataConsumer, IDataP
             }
             catch (Exception ex)
             {
-
                 string ExceptionMessage = ex.Message.ToString();
                 return new ResultData("False", (IDictionary<string, object>)new Dictionary<string, object>()
                 {
