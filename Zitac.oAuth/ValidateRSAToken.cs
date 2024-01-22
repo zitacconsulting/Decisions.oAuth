@@ -22,6 +22,7 @@ public class ValidateToken : BaseFlowAwareStep, ISyncStep, IDataConsumer, IDataP
             dataDescriptionList.Add(new DataDescription((DecisionsType)new DecisionsNativeType(typeof(String)), "Token String"));
             dataDescriptionList.Add(new DataDescription((DecisionsType)new DecisionsNativeType(typeof(String)), "Modulus (n)"));
             dataDescriptionList.Add(new DataDescription((DecisionsType)new DecisionsNativeType(typeof(String)), "Exponent (e)"));
+            dataDescriptionList.Add(new DataDescription((DecisionsType)new DecisionsNativeType(typeof(String)), "Valid Issuer"));
             return dataDescriptionList.ToArray();
         }
     }
@@ -33,7 +34,7 @@ public class ValidateToken : BaseFlowAwareStep, ISyncStep, IDataConsumer, IDataP
             List<OutcomeScenarioData> outcomeScenarioDataList = new List<OutcomeScenarioData>();
 
             outcomeScenarioDataList.Add(new OutcomeScenarioData("True"));
-            outcomeScenarioDataList.Add(new OutcomeScenarioData("False"));
+            outcomeScenarioDataList.Add(new OutcomeScenarioData("False", new DataDescription(typeof(string), "Validation Error")));
             return outcomeScenarioDataList.ToArray();
         }
     }
@@ -43,7 +44,8 @@ public class ValidateToken : BaseFlowAwareStep, ISyncStep, IDataConsumer, IDataP
         string token = data.Data["Token String"] as string;
         string n = data.Data["Modulus (n)"] as string;
         string e = data.Data["Exponent (e)"] as string;
- 
+        string validIssuer = data.Data["Valid Issuer"] as string;
+
 
         // Convert Base64 URL encoded strings to byte arrays
         var modulusBytes = Base64UrlDecode(n);
@@ -65,7 +67,8 @@ public class ValidateToken : BaseFlowAwareStep, ISyncStep, IDataConsumer, IDataP
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new RsaSecurityKey(rsa),
-                ValidateIssuer = false,
+                ValidateIssuer = true,
+                ValidIssuer = validIssuer,
                 ValidateAudience = false
             };
 
@@ -79,7 +82,15 @@ public class ValidateToken : BaseFlowAwareStep, ISyncStep, IDataConsumer, IDataP
             }
             catch (Exception ex)
             {
-                return new ResultData("False");
+
+                string ExceptionMessage = ex.Message.ToString();
+                return new ResultData("False", (IDictionary<string, object>)new Dictionary<string, object>()
+                {
+                {
+                    "Validation Error",
+                    (object) ExceptionMessage
+                }
+                });
             }
         }
     }
