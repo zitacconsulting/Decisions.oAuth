@@ -1,0 +1,22 @@
+{
+    "Resources": {
+        "NoComponents": true,
+        "CoreServicesDlls": [
+            "./Zitac.oAuth/bin/Zitac.oAuth.dll"
+        ],
+        "ReferenceDlls": [
+        ],
+        "CustomImages": null,
+        "CliDlls": null,
+        "WebPages": null,
+        "SilverlightDlls": null,
+        "AgentDlls": null,
+        "InstallScript": null,
+        "SqlScripts": null,
+        "ObjectsToImport": null,
+        "MsSqlScript": null
+    },
+    "Version": "9.5.0",
+    "ImagePath": "oAuth.svg",
+    "Description": "This module adds steps to validate oAuth tokens"
+}
