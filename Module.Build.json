@@ -4,6 +4,9 @@
         "CoreServicesDlls": [
             "./Zitac.oAuth/bin/Zitac.oAuth.dll"
         ],
+        "CustomImages": [
+            "oAuth.svg"
+        ],
         "ReferenceDlls": [
         ],
         "CustomImages": null,
@@ -16,7 +19,7 @@
         "ObjectsToImport": null,
         "MsSqlScript": null
     },
-    "Version": "9.5.0",
+    "Version": "9.6.0",
     "ImagePath": "oAuth.svg",
     "Description": "This module adds steps to validate oAuth tokens"
 }
