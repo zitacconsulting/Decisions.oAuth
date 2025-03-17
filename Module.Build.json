@@ -18,7 +18,7 @@
         "ObjectsToImport": null,
         "MsSqlScript": null
     },
-    "Version": "9.7.0",
+    "Version": "9.8.0",
     "ImagePath": "oAuth.svg",
     "Description": "This module adds steps to validate oAuth tokens"
 }
